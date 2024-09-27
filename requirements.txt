@@ -1,1 +1,3 @@
-pip install selenium python-telegram-bot beautifulsoup4
+selenium
+python-telegram-bot
+beautifulsoup4
