@@ -87,11 +87,11 @@ async def check_marketplace(keywords, location):
             print(f"Error checking marketplace for keyword '{keyword}': {e}")
         
         finally:
-            await send_telegram_message(f"Round Finish: {keyword}")        
+            await send_telegram_message(f"Round Finish")        
             
             driver.quit()  # Close the browser
 async def main():
-    keyword_input ="iphone" #keywords_input = input("Enter keywords (comma-separated): ")
+    keywords_input ="iphone" #keywords_input = input("Enter keywords (comma-separated): ")
     keywords = [keyword.strip() for keyword in keywords_input.split(',')]
     location = "melbourne" #location = input("Enter location: ")
 
