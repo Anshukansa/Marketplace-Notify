@@ -1,1 +1,1 @@
-web: python market.py
+worker: python market.py
