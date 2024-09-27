@@ -92,7 +92,7 @@ async def check_marketplace(keywords, location):
         finally:
             driver.quit()  # Close the browser
 async def main():
-    keywords_input = input("Enter keywords (comma-separated): ")
+    keywords_input = "iphone 11" #keywords_input = input("Enter keywords (comma-separated): ")
     keywords = [keyword.strip() for keyword in keywords_input.split(',')]
     location = "melbourne" #location = input("Enter location: ")
 
