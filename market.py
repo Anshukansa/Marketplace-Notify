@@ -81,7 +81,7 @@ async def check_marketplace(keywords, location):
 
                     if listing_hash not in seen_listings:
                         seen_listings.add(listing_hash)
-                        await send_telegram_message(f"New listing: {title}\nLink: https://www.facebook.com{link}")        
+                    await send_telegram_message(f"New listing: {title}\nLink: https://www.facebook.com{link}")        
 
         except Exception as e:
             print(f"Error checking marketplace for keyword '{keyword}': {e}")
