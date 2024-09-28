@@ -87,7 +87,7 @@ async def main():
 
     while True:
         await check_marketplace(keywords, location)
-        #await asyncio.sleep(300)  # Wait for 5 minutes before the next check
+        await asyncio.sleep(300)  # Wait for 5 minutes before the next check
 
 
 if __name__ == "__main__":
