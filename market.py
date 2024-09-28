@@ -31,10 +31,10 @@ bot = Bot(token=TELEGRAM_TOKEN)
 seen_listings = set()
 
 
-def send_telegram_message(message):
-    bot.send_message(chat_id=CHAT_ID, text=message)
+async def send_telegram_message(message):
+    await bot.send_message(chat_id=CHAT_ID, text=message)
 
-def check_marketplace(keywords, location):
+async def check_marketplace(keywords, location):
     url_template = f"https://www.facebook.com/marketplace/{location}/search?daysSinceListed=1&sortBy=creation_time_descend&query={{keyword}}&exact=false"
 
     for keyword in keywords:
@@ -72,13 +72,13 @@ def check_marketplace(keywords, location):
 
                     if link not in seen_listings:
                         seen_listings.add(link)
-                        send_telegram_message(f"Price: {price}\nLink: https://www.facebook.com{link}")
+                        await send_telegram_message(f"Price: {price}\nLink: https://www.facebook.com{link}")
 
         except Exception as e:
             print(f"Error checking marketplace for keyword '{keyword}': {e}")
 
         finally:
-            send_telegram_message(f"Round Finsih: {keyword}")
+            await send_telegram_message(f"Round Finsih: {keyword}")
             driver.quit()  # Close the browser
 
 async def main():
@@ -86,7 +86,7 @@ async def main():
     keywords = [keyword.strip() for keyword in keywords_input.split(',')]
     location = "melbourne" #location = input("Enter location: ")
 
-    check_marketplace(keywords, location)
+    await check_marketplace(keywords, location)
 
 if __name__ == "__main__":
     asyncio.run(main())
