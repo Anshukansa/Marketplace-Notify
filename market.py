@@ -60,6 +60,7 @@ async def check_marketplace(keywords, location):
             for listing in listings:
                 #title_element = listing.find('span', class_='x1lliihq x6ikm8r x10wlt62 x1n2onr6')  # Adjust as necessary
                 link_element = listing.find('a', class_='x1i10hfl')  # Adjust as necessary
+                await send_telegram_message(f"checked {link_element}")
                 price_element = listing.find('div', class_='x1gslohp')
                 #address_element = listing.find('span', class_='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1lliihq x1s928wv xhkezso x1gmr53x x1cpjm7i x1fgarty x1943h6x x4zkp8e x3x7a5m x1nxh6w3 x1sibtaa xo1l8bm xi81zsa')
 
