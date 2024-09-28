@@ -22,6 +22,7 @@ chrome_options.add_argument("--headless")  # Enable headless mode
 chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
 chrome_options.add_argument('--disable-gpu')
+chrome_options.add_argument("--remote-debugging-port=9222")
 
 # service = Service(r'C:\Users\dell\Desktop\Marketplace\chromedriver\chromedriver.exe') # Update this line for correct chrome driver path
 
