@@ -74,7 +74,7 @@ async def check_marketplace(keywords, location):
                     await send_telegram_message(f"Price: {price}\nLink: https://www.facebook.com{link}")
 
         except Exception as e:
-            print(f"Error checking marketplace for keyword '{keyword}': {e}")
+            await send_telegram_message(f"Error checking marketplace for keyword '{keyword}': {e}")
 
         finally:
             await send_telegram_message(f"Round Finish")
