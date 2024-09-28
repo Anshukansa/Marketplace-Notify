@@ -61,7 +61,7 @@ async def check_marketplace(keywords, location):
         try:
             # Open the URL
             driver.get(url)
-            await asyncio.sleep(20) 
+            await asyncio.sleep(60) 
             # Get page source and parse it with BeautifulSoup
             soup = BeautifulSoup(driver.page_source, 'html.parser')
 
