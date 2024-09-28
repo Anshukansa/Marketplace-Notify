@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from telegram import Bot
 import time
 import asyncio
-import chromedriver_autoinstaller
+#import chromedriver_autoinstaller
 import hashlib
 
 
@@ -18,7 +18,7 @@ TELEGRAM_TOKEN = '7621738371:AAFzRuvAFroszoqE-ciZp8Eyg-km7GloMq4'
 CHAT_ID = '5399212579'
 
 # Install the ChromeDriver matching the installed Chrome version if not available
-chromedriver_autoinstaller.install()
+#chromedriver_autoinstaller.install()
 
 # Set up Selenium with headless option
 chrome_options = Options()
