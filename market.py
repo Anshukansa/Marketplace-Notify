@@ -31,10 +31,10 @@ bot = Bot(token=TELEGRAM_TOKEN)
 seen_listings = set()
 
 
-async def send_telegram_message(message):
-    await bot.send_message(chat_id=CHAT_ID, text=message)
+def send_telegram_message(message):
+    bot.send_message(chat_id=CHAT_ID, text=message)
 
-async def check_marketplace(keywords, location):
+def check_marketplace(keywords, location):
     url_template = f"https://www.facebook.com/marketplace/{location}/search?daysSinceListed=1&sortBy=creation_time_descend&query={{keyword}}&exact=false"
 
     for keyword in keywords:
@@ -51,7 +51,7 @@ async def check_marketplace(keywords, location):
         try:
             # Open the URL
             driver.get(url)
-            await asyncio.sleep(20)
+            time.sleep(20)
             # Get page source and parse it with BeautifulSoup
             soup = BeautifulSoup(driver.page_source, 'html.parser')
 
@@ -72,13 +72,13 @@ async def check_marketplace(keywords, location):
 
                     if link not in seen_listings:
                         seen_listings.add(link)
-                        await send_telegram_message(f"Price: {price}\nLink: https://www.facebook.com{link}")
+                        send_telegram_message(f"Price: {price}\nLink: https://www.facebook.com{link}")
 
         except Exception as e:
             print(f"Error checking marketplace for keyword '{keyword}': {e}")
 
         finally:
-            await send_telegram_message(f"Round Finsih: {keyword}")
+            send_telegram_message(f"Round Finsih: {keyword}")
             driver.quit()  # Close the browser
 
 async def main():
@@ -86,7 +86,7 @@ async def main():
     keywords = [keyword.strip() for keyword in keywords_input.split(',')]
     location = "melbourne" #location = input("Enter location: ")
 
-    await check_marketplace(keywords, location)
+    check_marketplace(keywords, location)
 
 if __name__ == "__main__":
     asyncio.run(main())
