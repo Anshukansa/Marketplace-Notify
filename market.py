@@ -1,6 +1,4 @@
 import os
-from sys import executable
-
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -19,13 +17,13 @@ CHAT_ID = '5399212579'
 # chromedriver_autoinstaller.install()
 
 # Set up Selenium with headless option
-chrome_options = Options()
-chrome_options.binary_location = os.environ.get("GOOGLE_CROME_BIN")
-chrome_options.add_argument("--headless")  # Enable headless mode
+chrome_options = webdriver.ChromeOptions()
+chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--no-sandbox")
-chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
-chrome_options.add_argument('--disable-gpu')
-driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), chrome_options=chrome_options)
+driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=chrome_options)
+
 # service = Service(r'C:\Users\dell\Desktop\Marketplace\chromedriver\chromedriver.exe') # Update this line for correct chrome driver path
 
 bot = Bot(token=TELEGRAM_TOKEN)
@@ -81,13 +79,13 @@ async def check_marketplace(keywords, location):
             print(f"Error checking marketplace for keyword '{keyword}': {e}")
 
         finally:
-            await send_telegram_message(f"Round Finsih: {keyword}")
+            await send_telegram_message(f"Round Finish: {keyword}")
             driver.quit()  # Close the browser
 
 async def main():
     keywords_input = "iphone 11, iphone 12, iphone 13, iphone 14" #keywords_input = input("Enter keywords (comma-separated): ")
     keywords = [keyword.strip() for keyword in keywords_input.split(',')]
-    location = input("Enter location: ")
+    location = "melbourne" #location = input("Enter location: ")
 
     await check_marketplace(keywords, location)
 
