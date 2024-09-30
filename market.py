@@ -87,7 +87,7 @@ async def check_marketplace(keywords, location):
 async def main():
     keywords_input = "iphone 11, iphone 12, iphone 13, iphone 14" #keywords_input = input("Enter keywords (comma-separated): ")
     keywords = [keyword.strip() for keyword in keywords_input.split(',')]
-    location = "melbourne" #location = input("Enter location: ")
+    location = input("Enter location: ")
 
     await check_marketplace(keywords, location)
 
