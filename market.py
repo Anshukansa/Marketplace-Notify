@@ -18,7 +18,7 @@ chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
 # chrome_options.add_argument("--window-size=1920x1080")
 
-service = Service(r'CHROMEDRIVER_PATH') # Update this line for correct chrome driver path
+service = Service('app/.chrome-for-testing/chromedriver-linux64/chromedriver') # Update this line for correct chrome driver path
 
 bot = Bot(token=TELEGRAM_TOKEN)
 
