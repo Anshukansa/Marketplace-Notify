@@ -19,6 +19,10 @@ CHAT_ID = '5399212579'
 # Set up Chrome options
 chrome_options = Options()
 # Add any desired Chrome options here
+# Set up Selenium with headless option
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--disable-dev-shm-usage")
+chrome_options.add_argument("--no-sandbox")
 
 # Specify the path to the ChromeDriver
 chromedriver_path = os.environ.get("CHROMEDRIVER_PATH")
@@ -28,13 +32,6 @@ service = Service(chromedriver_path)
 
 # Initialize the WebDriver with the Service object and options
 driver = webdriver.Chrome(service=service, options=chrome_options)
-
-# Set up Selenium with headless option
-
-
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--disable-dev-shm-usage")
-chrome_options.add_argument("--no-sandbox")
 
 
 # service = Service(r'C:\Users\dell\Desktop\Marketplace\chromedriver\chromedriver.exe') # Update this line for correct chrome driver path
