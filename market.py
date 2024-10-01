@@ -84,7 +84,7 @@ async def check_marketplace(keywords, location):
             print(f"Error checking marketplace for keyword '{keyword}': {e}")
 
         finally:
-            #await send_telegram_message(f"Round Finish: {keyword}")
+            await send_telegram_message(f"Round Finish: {keyword}")
             driver.quit()  # Close the browser
 
 async def main():
