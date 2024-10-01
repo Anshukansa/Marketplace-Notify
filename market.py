@@ -16,13 +16,26 @@ CHAT_ID = '5399212579'
 # Install the ChromeDriver matching the installed Chrome version if not available
 # chromedriver_autoinstaller.install()
 
+# Set up Chrome options
+chrome_options = Options()
+# Add any desired Chrome options here
+
+# Specify the path to the ChromeDriver
+chromedriver_path = os.environ.get("CHROMEDRIVER_PATH")
+
+# Create a Service object
+service = Service(chromedriver_path)
+
+# Initialize the WebDriver with the Service object and options
+driver = webdriver.Chrome(service=service, options=chrome_options)
+
 # Set up Selenium with headless option
-chrome_options = webdriver.ChromeOptions()
-chrome_options.binary_location = os.environ.get("GOOGLE_CHROME_BIN")
+
+
 chrome_options.add_argument("--headless")
 chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--no-sandbox")
-driver = webdriver.Chrome(executable_path=os.environ.get("CHROMEDRIVER_PATH"), options=chrome_options)
+
 
 # service = Service(r'C:\Users\dell\Desktop\Marketplace\chromedriver\chromedriver.exe') # Update this line for correct chrome driver path
 
