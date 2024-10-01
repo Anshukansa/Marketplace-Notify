@@ -23,6 +23,12 @@ chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
 chrome_options.add_argument('--disable-gpu')
 
+# Specify the path to the ChromeDriver
+chromedriver_path = os.environ.get("CHROMEDRIVER_PATH")
+
+# Create a Service object
+service = Service(chromedriver_path)
+
 # service = Service(r'C:\Users\dell\Desktop\Marketplace\chromedriver\chromedriver.exe') # Update this line for correct chrome driver path
 
 bot = Bot(token=TELEGRAM_TOKEN)
