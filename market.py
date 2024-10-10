@@ -1,8 +1,10 @@
+import os
 import time
-from telegram import Bot
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
+from telegram import Bot
+from telegram.ext import Updater, CommandHandler, CallbackContext
 
 # Set up Telegram bot
 TOKEN = '7621738371:AAFzRuvAFroszoqE-ciZp8Eyg-km7GloMq4'
@@ -10,21 +12,32 @@ CHAT_ID = '5399212579'
 bot = Bot(token=TOKEN)
 
 # Set up Selenium WebDriver
-chrome_options = Options()
-chrome_options.add_argument("--headless")  # Run in headless mode
-chrome_options.add_argument("--no-sandbox")
-chrome_options.add_argument("--disable-dev-shm-usage")
-chrome_service = Service('/usr/local/bin/chromedriver')  # Path for chromedriver in Heroku
+def create_webdriver():
+    chrome_options = Options()
+    chrome_options.add_argument('--headless')  # Run headless
+    chrome_options.add_argument('--no-sandbox')
+    chrome_options.add_argument('--disable-dev-shm-usage')
+    service = Service('/chromedriver')  # Adjust the path if needed
+    return webdriver.Chrome(service=service, options=chrome_options)
 
-def send_message(message):
-    bot.send_message(chat_id=CHAT_ID, text=message)
+# Command handler for /title
+def get_title(update, context: CallbackContext):
+    driver = create_webdriver()
+    driver.get('https://www.google.com')
+    time.sleep(2)  # Wait for the page to load
+    title = driver.title
+    driver.quit()
+    
+    update.message.reply_text(f'The title of the page is: {title}')
 
 def main():
-    driver = webdriver.Chrome(service=chrome_service, options=chrome_options)
-    driver.get("http://google.com")  # Change to any URL you want to visit
-    time.sleep(5)  # Wait for the page to load
-    send_message("Visited google.com")
-    driver.quit()
+    updater = Updater(TOKEN)
+    dispatcher = updater.dispatcher
 
-if __name__ == "__main__":
+    dispatcher.add_handler(CommandHandler("title", get_title))
+
+    updater.start_polling()
+    updater.idle()
+
+if __name__ == '__main__':
     main()
