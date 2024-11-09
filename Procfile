@@ -1,1 +1,1 @@
-worker: python market.py
+worker: python main.py
