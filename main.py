@@ -10,7 +10,7 @@ from telegram import Bot
 
 # Telegram bot token
 TELEGRAM_TOKEN = '7714782007:AAEgB8XlRut-5HhKNWHaY7tBg1B6nCodci8'
-CHAT_ID = '5399212579'
+CHAT_ID = '7932502148'
 
 # Fetch the Chrome binary and ChromeDriver paths from environment variables
 chrome_binary_path = os.getenv('CHROME_BINARY_PATH', '/default/path/to/chrome')  # Default if not set
