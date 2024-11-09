@@ -40,7 +40,7 @@ async def send_telegram_message(message, chat_id):
 
 
 # Check marketplace for specific user with keywords and location
-async def check_marketplace(keywords, location, chat_id):
+async def check_marketplace(keywords, location, chat_id, excluded_words):
     url_template = f"https://www.facebook.com/marketplace/{location}/search?daysSinceListed=1&sortBy=creation_time_descend&query={{keyword}}&exact=false"
 
     # Initialize seen listings for this user if not already present
@@ -72,11 +72,16 @@ async def check_marketplace(keywords, location, chat_id):
                 price_element = listing.find('div', class_='x1gslohp')
                 title_element = listing.find('span', class_='x1lliihq x6ikm8r x10wlt62 x1n2onr6')
 
-                if link_element and price_element:
+                if link_element and price_element and title_element:
                     link = link_element['href']
                     price = price_element.text.strip()
                     title = title_element.text.strip()
 
+                    # Check if title contains any excluded word
+                    if any(excluded_word.lower() in title.lower() for excluded_word in excluded_words):
+                        continue  # Skip this listing if any excluded word is found
+
+                    # Check if the listing has been seen before
                     if link not in user_seen_listings[chat_id]:
                         user_seen_listings[chat_id].add(link)
                         await send_telegram_message(f"Price: {price} ({keyword})\nLink: https://www.facebook.com{link}",
@@ -94,8 +99,9 @@ async def check_marketplace_for_user(user):
     keywords = user["keywords"]
     location = user["location"]
     chat_id = user["user_id"]
+    excluded_words = user.get("excluded_words", [])  # Get excluded words if available
 
-    await check_marketplace(keywords, location, chat_id)
+    await check_marketplace(keywords, location, chat_id, excluded_words)
 
 
 # Main function to load users and run checks in parallel
