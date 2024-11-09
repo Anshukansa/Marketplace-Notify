@@ -11,20 +11,29 @@ from telegram import Bot
 # Telegram bot token
 TELEGRAM_TOKEN = '7714782007:AAEgB8XlRut-5HhKNWHaY7tBg1B6nCodci8'
 
+# Get the Chrome binary and ChromeDriver paths from environment variables
+chrome_binary_path = os.getenv('CHROME_BINARY_PATH')
+chromedriver_path = os.getenv('CHROMEDRIVER_PATH')
 
-# Explicit paths for Chrome and ChromeDriver
-chrome_binary_path = "/tmp/build_7a273c8b/.chrome-for-testing/chrome-linux64/chrome"
-chromedriver_path = "/tmp/build_7a273c8b/.chrome-for-testing/chromedriver-linux64/chromedriver"
+# Ensure that the environment variables are set correctly
+if not chrome_binary_path or not chromedriver_path:
+    raise ValueError("Chrome binary path or ChromeDriver path environment variables not set")
 
-# Set Chrome options
-chrome_options = webdriver.ChromeOptions()
+# Check if the files exist at these paths
+if not os.path.isfile(chrome_binary_path):
+    raise FileNotFoundError(f"Chrome binary not found at {chrome_binary_path}")
+if not os.path.isfile(chromedriver_path):
+    raise FileNotFoundError(f"ChromeDriver binary not found at {chromedriver_path}")
+
+# Set Chrome options and initialize the WebDriver
+chrome_options = Options()
 chrome_options.binary_location = chrome_binary_path
-chrome_options.add_argument("--headless")  # Run in headless mode
-chrome_options.add_argument("--no-sandbox")  # Required for Heroku
-chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
-chrome_options.add_argument("--disable-gpu")  # Disable GPU for headless environments
+chrome_options.add_argument("--headless")
+chrome_options.add_argument("--no-sandbox")
+chrome_options.add_argument("--disable-dev-shm-usage")
+chrome_options.add_argument("--disable-gpu")
 
-# Specify ChromeDriver's path using Service
+# Initialize the Chrome WebDriver with the correct service
 service = Service(chromedriver_path)
 driver = webdriver.Chrome(service=service, options=chrome_options)
 
