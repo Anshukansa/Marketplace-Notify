@@ -1,29 +1,44 @@
 import os
+import json
+import time
+import asyncio
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
 from telegram import Bot
-import time
-import asyncio
-import chromedriver_autoinstaller
 
-# Telegram bot token and chat ID variables
-TELEGRAM_TOKEN = '7621738371:AAFzRuvAFroszoqE-ciZp8Eyg-km7GloMq4'
+# Telegram bot token
+TELEGRAM_TOKEN = '7714782007:AAEgB8XlRut-5HhKNWHaY7tBg1B6nCodci8'
 CHAT_ID = '5399212579'
 
-# Install the ChromeDriver matching the installed Chrome version if not available
-# chromedriver_autoinstaller.install()
+# Fetch the Chrome binary and ChromeDriver paths from environment variables
+chrome_binary_path = os.getenv('CHROME_BINARY_PATH', '/default/path/to/chrome')  # Default if not set
+chromedriver_path = os.getenv('CHROMEDRIVER_PATH', '/default/path/to/chromedriver')  # Default if not set
 
-# Set up Selenium with headless option
+# Ensure that the environment variables are set correctly
+if not chrome_binary_path or not chromedriver_path:
+    raise ValueError("Chrome binary path or ChromeDriver path environment variables not set")
+
+# Check if the files exist at these paths
+if not os.path.isfile(chrome_binary_path):
+    raise FileNotFoundError(f"Chrome binary not found at {chrome_binary_path}")
+if not os.path.isfile(chromedriver_path):
+    raise FileNotFoundError(f"ChromeDriver binary not found at {chromedriver_path}")
+
+# Set up Chrome options
 chrome_options = Options()
-chrome_options.add_argument("--headless")  # Enable headless mode
+chrome_options.binary_location = chrome_binary_path
+chrome_options.add_argument("--headless")
 chrome_options.add_argument("--no-sandbox")
-chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
-chrome_options.add_argument('--disable-gpu')
+chrome_options.add_argument("--disable-dev-shm-usage")
+chrome_options.add_argument("--disable-gpu")
 
-# service = Service(r'C:\Users\dell\Desktop\Marketplace\chromedriver\chromedriver.exe') # Update this line for correct chrome driver path
+# Initialize the ChromeDriver service
+service = Service(chromedriver_path)
+
+# Initialize the WebDriver
+driver = webdriver.Chrome(service=service, options=chrome_options)
 
 bot = Bot(token=TELEGRAM_TOKEN)
 
