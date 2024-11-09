@@ -10,7 +10,7 @@ from telegram import Bot
 import chromedriver_autoinstaller
 
 # Telegram bot token
-TELEGRAM_TOKEN = 'YOUR_TELEGRAM_BOT_TOKEN'
+TELEGRAM_TOKEN = '7714782007:AAEgB8XlRut-5HhKNWHaY7tBg1B6nCodci8'
 
 # Install the ChromeDriver matching the installed Chrome version if not available
 chromedriver_autoinstaller.install()
@@ -27,14 +27,17 @@ bot = Bot(token=TELEGRAM_TOKEN)
 # Store already seen listings per user
 user_seen_listings = {}
 
+
 # Load user data from the JSON-formatted text file
 def load_users(filename="users.txt"):
     with open(filename, "r") as file:
         return json.load(file)
 
+
 # Send message to specific user chat
 async def send_telegram_message(message, chat_id):
     await bot.send_message(chat_id=chat_id, text=message)
+
 
 # Check marketplace for specific user with keywords and location
 async def check_marketplace(keywords, location, chat_id):
@@ -67,20 +70,24 @@ async def check_marketplace(keywords, location, chat_id):
             for listing in listings:
                 link_element = listing.find('a', class_='x1i10hfl')  # Adjust as necessary
                 price_element = listing.find('div', class_='x1gslohp')
-                
+                title_element = listing.find('span', class_='x1lliihq x6ikm8r x10wlt62 x1n2onr6')
+
                 if link_element and price_element:
                     link = link_element['href']
                     price = price_element.text.strip()
+                    title = title_element.text.strip()
 
                     if link not in user_seen_listings[chat_id]:
                         user_seen_listings[chat_id].add(link)
-                        await send_telegram_message(f"Price: {price} ({keyword})\nLink: https://www.facebook.com{link}", chat_id)
+                        await send_telegram_message(f"Price: {price} ({keyword})\nLink: https://www.facebook.com{link}",
+                                                    chat_id)
 
         except Exception as e:
             print(f"Error checking marketplace for keyword '{keyword}' and user '{chat_id}': {e}")
 
         finally:
             driver.quit()  # Close the browser
+
 
 # Run the marketplace check for each user
 async def check_marketplace_for_user(user):
@@ -90,6 +97,7 @@ async def check_marketplace_for_user(user):
 
     await check_marketplace(keywords, location, chat_id)
 
+
 # Main function to load users and run checks in parallel
 async def main():
     users = load_users()
@@ -97,6 +105,7 @@ async def main():
         # Run scraping for all users in parallel
         await asyncio.gather(*(check_marketplace_for_user(user) for user in users))
         await asyncio.sleep(300)  # Wait for 5 minutes before the next check
+
 
 if __name__ == "__main__":
     asyncio.run(main())
