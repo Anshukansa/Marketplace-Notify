@@ -11,9 +11,9 @@ from telegram import Bot
 # Telegram bot token
 TELEGRAM_TOKEN = '7714782007:AAEgB8XlRut-5HhKNWHaY7tBg1B6nCodci8'
 
-# Get the Chrome binary and ChromeDriver paths from environment variables
-chrome_binary_path = os.getenv('CHROME_BINARY_PATH')
-chromedriver_path = os.getenv('CHROMEDRIVER_PATH')
+# Fetch the Chrome binary and ChromeDriver paths from environment variables
+chrome_binary_path = os.getenv('CHROME_BINARY_PATH', '/default/path/to/chrome')  # Default if not set
+chromedriver_path = os.getenv('CHROMEDRIVER_PATH', '/default/path/to/chromedriver')  # Default if not set
 
 # Ensure that the environment variables are set correctly
 if not chrome_binary_path or not chromedriver_path:
@@ -25,7 +25,7 @@ if not os.path.isfile(chrome_binary_path):
 if not os.path.isfile(chromedriver_path):
     raise FileNotFoundError(f"ChromeDriver binary not found at {chromedriver_path}")
 
-# Set Chrome options and initialize the WebDriver
+# Set up Chrome options
 chrome_options = Options()
 chrome_options.binary_location = chrome_binary_path
 chrome_options.add_argument("--headless")
@@ -33,8 +33,10 @@ chrome_options.add_argument("--no-sandbox")
 chrome_options.add_argument("--disable-dev-shm-usage")
 chrome_options.add_argument("--disable-gpu")
 
-# Initialize the Chrome WebDriver with the correct service
+# Initialize the ChromeDriver service
 service = Service(chromedriver_path)
+
+# Initialize the WebDriver
 driver = webdriver.Chrome(service=service, options=chrome_options)
 
 bot = Bot(token=TELEGRAM_TOKEN)
