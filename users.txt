@@ -1,0 +1,8 @@
+[
+    {
+        "user_id": "7932502148",
+        "keywords": ["iphone 11", "iphone 12", "iphone 13", "iphone 14", "iphone 15", "iphone 16"],
+        "location": "melbourne",
+        "excluded_words": ["Warranty"]
+    }
+]
