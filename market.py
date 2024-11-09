@@ -12,10 +12,6 @@ from telegram import Bot
 TELEGRAM_TOKEN = '7714782007:AAEgB8XlRut-5HhKNWHaY7tBg1B6nCodci8'
 
 
-# Install ChromeDriver automatically
-chromedriver_autoinstaller.install()
-
-
 # Explicit paths for Chrome and ChromeDriver
 chrome_binary_path = "/tmp/build_7a273c8b/.chrome-for-testing/chrome-linux64/chrome"
 chromedriver_path = "/tmp/build_7a273c8b/.chrome-for-testing/chromedriver-linux64/chromedriver"
