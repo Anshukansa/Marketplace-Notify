@@ -11,20 +11,24 @@ import chromedriver_autoinstaller
 # Telegram bot token
 TELEGRAM_TOKEN = '7714782007:AAEgB8XlRut-5HhKNWHaY7tBg1B6nCodci8'
 
-# Install the ChromeDriver matching the installed Chrome version if not available
+
+# Install ChromeDriver automatically
 chromedriver_autoinstaller.install()
 
-# Define the Chrome path for Heroku
-chrome_path = "/app/.apt/usr/bin/google-chrome-stable"
+# Explicitly specify Chrome binary path on Heroku
+chrome_binary_path = "/app/.apt/usr/bin/google-chrome"
 
-# Set up Chrome options
+# Set Chrome options
 chrome_options = webdriver.ChromeOptions()
-chrome_options.binary_location = chrome_path
+chrome_options.binary_location = chrome_binary_path
 chrome_options.add_argument("--headless")  # Run in headless mode
-chrome_options.add_argument("--no-sandbox")  # Disable the sandbox
-chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resources
+chrome_options.add_argument("--no-sandbox")  # Required for Heroku
+chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
 chrome_options.add_argument("--disable-gpu")  # Disable GPU for headless environments
-chrome_options.add_argument("--remote-debugging-port=9222")
+chrome_options.add_argument("--remote-debugging-port=9222")  # Remote debugging
+
+# Initialize WebDriver with these options
+driver = webdriver.Chrome(options=chrome_options)
 
 bot = Bot(token=TELEGRAM_TOKEN)
 
