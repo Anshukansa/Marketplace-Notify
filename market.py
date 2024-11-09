@@ -15,12 +15,17 @@ TELEGRAM_TOKEN = '7714782007:AAEgB8XlRut-5HhKNWHaY7tBg1B6nCodci8'
 # Install the ChromeDriver matching the installed Chrome version if not available
 chromedriver_autoinstaller.install()
 
-# Set up Selenium with headless option
-chrome_options = Options()
-chrome_options.add_argument("--headless")  # Enable headless mode
-chrome_options.add_argument("--no-sandbox")
-chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resource problems
-chrome_options.add_argument('--disable-gpu')
+# Define the Chrome path for Heroku
+chrome_path = "/app/.apt/usr/bin/google-chrome-stable"
+
+# Set up Chrome options
+chrome_options = webdriver.ChromeOptions()
+chrome_options.binary_location = chrome_path
+chrome_options.add_argument("--headless")  # Run in headless mode
+chrome_options.add_argument("--no-sandbox")  # Disable the sandbox
+chrome_options.add_argument("--disable-dev-shm-usage")  # Overcome limited resources
+chrome_options.add_argument("--disable-gpu")  # Disable GPU for headless environments
+chrome_options.add_argument("--remote-debugging-port=9222")
 
 bot = Bot(token=TELEGRAM_TOKEN)
 
