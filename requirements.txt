@@ -1,5 +1,4 @@
 selenium
-python-telegram-bot
+psycopg2-binary
 beautifulsoup4
-chromedriver_autoinstaller
-urllib3
+python-telegram-bot
