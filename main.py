@@ -1,110 +1,168 @@
 import os
-import json
-import time
 import asyncio
+import random
 from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.by import By
 from bs4 import BeautifulSoup
 from telegram import Bot
+from telegram.error import TelegramError
+from collections import defaultdict
 
 # Telegram bot token
-TELEGRAM_TOKEN = '7714782007:AAEgB8XlRut-5HhKNWHaY7tBg1B6nCodci8'
-CHAT_ID = '7932502148'
+TELEGRAM_TOKEN = '7849538671:AAG-a0XCCff1SpnCF-cETQUNqu447Ez69rw'
 
-# Fetch the Chrome binary and ChromeDriver paths from environment variables
-chrome_binary_path = os.getenv('CHROME_BINARY_PATH', '/default/path/to/chrome')  # Default if not set
-chromedriver_path = os.getenv('CHROMEDRIVER_PATH', '/default/path/to/chromedriver')  # Default if not set
+# ChromeDriver setup
+def configure_chrome_options():
+    """Configure ChromeDriver with optimizations for lightweight scraping."""
+    chrome_options = Options()
+    chrome_options.add_argument("--headless")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--disable-gpu")
+    chrome_options.add_argument("--incognito")
+    chrome_options.add_argument("--disable-webgl")
+    chrome_options.add_argument("--blink-settings=imagesEnabled=false")  # Disable image loading
+    chrome_options.add_argument("--disable-cache")
+    chrome_options.add_argument("--disable-application-cache")
+    chrome_options.add_argument("--disk-cache-size=0")
+    return chrome_options
 
-# Ensure that the environment variables are set correctly
-if not chrome_binary_path or not chromedriver_path:
-    raise ValueError("Chrome binary path or ChromeDriver path environment variables not set")
-
-# Check if the files exist at these paths
-if not os.path.isfile(chrome_binary_path):
-    raise FileNotFoundError(f"Chrome binary not found at {chrome_binary_path}")
-if not os.path.isfile(chromedriver_path):
-    raise FileNotFoundError(f"ChromeDriver binary not found at {chromedriver_path}")
-
-# Set up Chrome options
-chrome_options = Options()
-chrome_options.binary_location = chrome_binary_path
-chrome_options.add_argument("--headless")
-chrome_options.add_argument("--no-sandbox")
-chrome_options.add_argument("--disable-dev-shm-usage")
-chrome_options.add_argument("--disable-gpu")
-
-# Initialize the ChromeDriver service
-service = Service(chromedriver_path)
-
-# Initialize the WebDriver
-driver = webdriver.Chrome(service=service, options=chrome_options)
-
+# Initialize Telegram bot
 bot = Bot(token=TELEGRAM_TOKEN)
 
-# Store already seen listings
-seen_listings = set()
+# Directly define user data
+users = [
+    {
+        "user_id": 7932502148,  # Example Telegram chat ID
+        "location": "melbourne",  # Example location
+        "keywords": ["iphone"],  # Example keywords
+        "excluded_words": ["Warranty",
+            "controller",
+            "for",
+            "stand",
+            "car",
+            "names",
+            "stereo",
+            "Repelacement",
+            "Cheapest",
+            "LCD",
+            "smart",
+            "C@$h",
+            "Ca$h"],  # Example excluded words
+    }
+]
 
+# Generate all unique keyword-location pairs
+def generate_pairs_and_log(users):
+    """Generate unique keyword-location pairs."""
+    pairs = set()
+    user_pair_map = defaultdict(list)
 
-async def send_telegram_message(message):
-    await bot.send_message(chat_id=CHAT_ID, text=message)
+    for user in users:
+        keywords = user["keywords"]
+        location = user["location"]
+        chat_id = user["user_id"]
+        excluded_words = user.get("excluded_words", [])
 
-async def check_marketplace(keywords, location):
-    url_template = f"https://www.facebook.com/marketplace/{location}/search?daysSinceListed=1&sortBy=creation_time_descend&query={{keyword}}&exact=false"
+        for keyword in keywords:
+            pair = (keyword, location)
+            pairs.add(pair)
+            user_pair_map[pair].append({"chat_id": chat_id, "excluded_words": excluded_words})
 
-    for keyword in keywords:
-        url = url_template.format(keyword=keyword)
+    return pairs, user_pair_map
 
-        # Create a new instance of the Chrome driver
-        driver = webdriver.Chrome(options=chrome_options)
-
-        # Clear browser cache
-        driver.execute_cdp_cmd('Network.clearBrowserCache', {})
-
-        # driver = webdriver.Chrome(service=service, options=chrome_options)
-
+# Send messages sequentially to avoid rate-limiting issues
+async def send_messages_sequentially(messages):
+    """Send messages sequentially to avoid overloading Telegram."""
+    for message, chat_id in messages:
         try:
-            # Open the URL
-            driver.get(url)
-            await asyncio.sleep(10)
-            # Get page source and parse it with BeautifulSoup
-            soup = BeautifulSoup(driver.page_source, 'html.parser')
+            await bot.send_message(chat_id=chat_id, text=message)
+        except TelegramError as e:
+            print(f"Failed to send message to {chat_id}: {e}")
 
-            # Adjust this selector based on the actual page structure
-            listings = soup.find_all('div', class_='xjp7ctv')  # Replace with actual class
+# Check listings for a given keyword-location pair
+async def check_marketplace_pair(pair, user_data, seen_listings):
+    """Check the marketplace for new listings and prepare messages for users."""
+    keyword, location = pair
+    url = f"https://www.facebook.com/marketplace/{location}/search?query={keyword}"
 
-            for listing in listings:
-                #title_element = listing.find('span', class_='x1lliihq x6ikm8r x10wlt62 x1n2onr6')  # Adjust as necessary
-                link_element = listing.find('a', class_='x1i10hfl')  # Adjust as necessary
-                price_element = listing.find('div', class_='x1gslohp')
-                #address_element = listing.find('span', class_='x193iq5w xeuugli x13faqbe x1vvkbs x1xmvt09 x1lliihq x1s928wv xhkezso x1gmr53x x1cpjm7i x1fgarty x1943h6x x4zkp8e x3x7a5m x1nxh6w3 x1sibtaa xo1l8bm xi81zsa')
+    # Configure and start Chrome
+    chrome_options = configure_chrome_options()
+    driver = webdriver.Chrome(options=chrome_options)
+    driver.delete_all_cookies()
 
-                if price_element:
-                    #title = title_element.text.strip()
-                    link = link_element['href']
-                    price = price_element.text.strip()
-                    #address = address_element.text.strip()
+    try:
+        driver.get(url)
+        await asyncio.sleep(10)
+        driver.refresh()
+        await asyncio.sleep(10)
 
-                    if link not in seen_listings:
-                        seen_listings.add(link)
-                        await send_telegram_message(f"Price: {price} ({keyword})\nLink: https://www.facebook.com{link}")
+        # Wait for listings to load
+        WebDriverWait(driver, 10).until(
+            EC.presence_of_all_elements_located((By.CLASS_NAME, "xjp7ctv"))
+        )
 
-        except Exception as e:
-            print(f"Error checking marketplace for keyword '{keyword}': {e}")
+        # Parse listings
+        soup = BeautifulSoup(driver.page_source, 'html.parser')
+        listings = soup.find_all('div', class_='xjp7ctv')
 
-        finally:
-            #await send_telegram_message(f"Round Finish: {keyword}")
-            driver.quit()  # Close the browser
+        messages = []
+        for listing in listings:
+            link_element = listing.find('a', class_='x1i10hfl')
+            price_element = listing.find('div', class_='x1gslohp')
+            title_element = listing.find('span', class_='x1lliihq x6ikm8r x10wlt62 x1n2onr6')
 
-async def main():
-    keywords_input = "iphone 11, iphone 12, iphone 13, iphone 14" #keywords_input = input("Enter keywords (comma-separated): ")
-    keywords = [keyword.strip() for keyword in keywords_input.split(',')]
-    location = "melbourne" #location = input("Enter location: ")
+            if link_element and price_element and title_element:
+                link = link_element['href']
+                price = price_element.text.strip()
+                title = title_element.text.strip()
 
-    while True:
-        await check_marketplace(keywords, location)
-        await asyncio.sleep(300)  # Wait for 5 minutes before the next check
+                # Skip if already seen
+                if link in seen_listings:
+                    continue
 
+                seen_listings.add(link)
 
+                # Prepare messages for relevant users
+                for user in user_data[pair]:
+                    chat_id = user["chat_id"]
+                    excluded_words = user["excluded_words"]
+
+                    # Skip if excluded words are found in title
+                    if any(word.lower() in title.lower() for word in excluded_words):
+                        continue
+
+                    message = f"Price: {price} ({keyword})\nLink: https://www.facebook.com{link}"
+                    messages.append((message, chat_id))
+
+        # Send messages sequentially
+        await send_messages_sequentially(messages)
+
+    except Exception as e:
+        print(f"Error checking pair {pair}: {e}")
+
+    finally:
+        driver.quit()
+
+# Run a single round of monitoring
+async def single_round_monitoring(users):
+    """Run a single round of monitoring for all user pairs."""
+    pairs, user_pair_map = generate_pairs_and_log(users)
+    seen_listings = set()  # Track seen listings across all pairs to avoid duplicates
+
+    # Create tasks for all pairs
+    tasks = [
+        check_marketplace_pair(pair, user_pair_map, seen_listings)
+        for pair in pairs
+    ]
+
+    # Run all tasks concurrently
+    await asyncio.gather(*tasks)
+    print("Single round completed.")
+
+# Run script
 if __name__ == "__main__":
-    asyncio.run(main())
+    asyncio.run(single_round_monitoring(users))
