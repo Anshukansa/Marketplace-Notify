@@ -187,7 +187,7 @@ async def check_marketplace_pair(pair, user_data):
 
     except Exception as e:
         print(f"Error checking pair {pair}: {e}")
-
+        traceback.print_exc()  # Add this to log the full error traceback
     finally:
         driver.quit()
 
