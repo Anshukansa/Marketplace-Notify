@@ -130,7 +130,7 @@ async def send_messages_sequentially(messages):
 async def check_marketplace_pair(pair, user_data):
     """Check the marketplace for new listings and prepare messages for users."""
     keyword, location = pair
-    url = f"https://www.facebook.com/marketplace/{location}/search?query={keyword}"
+    url = f"https://www.facebook.com/marketplace/{location}/search?minPrice=100&maxPrice=1000&daysSinceListed=1&sortBy=creation_time_descend&query={keyword}"
 
     # Configure and start Chrome
     chrome_options = configure_chrome_options()
@@ -139,9 +139,9 @@ async def check_marketplace_pair(pair, user_data):
 
     try:
         driver.get(url)
-        await asyncio.sleep(10)
+        await asyncio.sleep(60)
         driver.refresh()
-        await asyncio.sleep(10)
+        await asyncio.sleep(60)
 
         # Wait for listings to load
         WebDriverWait(driver, 10).until(
