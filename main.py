@@ -11,6 +11,8 @@ from bs4 import BeautifulSoup
 from telegram import Bot
 from telegram.error import TelegramError
 from collections import defaultdict
+import traceback
+
 
 # Telegram bot token
 TELEGRAM_TOKEN = os.environ.get('TELEGRAM_TOKEN', 'YOUR_TELEGRAM_BOT_TOKEN')
