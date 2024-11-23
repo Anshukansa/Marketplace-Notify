@@ -79,10 +79,22 @@ bot = Bot(token=TELEGRAM_TOKEN)
 # Directly define user data
 users = [
     {
-        "user_id": 123456789,  # Example Telegram chat ID
-        "location": "newyork",  # Example location
-        "keywords": ["laptop", "gaming chair"],  # Example keywords
-        "excluded_words": ["damaged", "broken"],  # Example excluded words
+        "user_id": 7932502148,  # Example Telegram chat ID
+        "location": "melbourne",  # Example location
+        "keywords": ["iphone"],  # Example keywords
+        "excluded_words": ["Warranty",
+            "controller",
+            "for",
+            "stand",
+            "car",
+            "names",
+            "stereo",
+            "Repelacement",
+            "Cheapest",
+            "LCD",
+            "smart",
+            "C@$h",
+            "Ca$h"],  # Example excluded words
     }
 ]
 
